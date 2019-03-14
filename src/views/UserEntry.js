@@ -31,13 +31,13 @@ const Id = styled.div`
  * https://reactjs.org/docs/components-and-props.html
  * @FunctionalComponent
  */
-const Player = ({ user }) => {
-  return (
-    <Container>
-        <UserName>{user.username}</UserName>
-        <Link to="/user" style={{color: 'white'}} activeStyle={{color: 'red'}}><Id>Id: {user.id}</Id></Link>
-    </Container>
-  );
+const UserEntry= ({ user }) => {
+    return (
+        <Container>
+            <UserName>{user.username}</UserName>
+            <Link to="/user" style={{color: 'white'}} activeStyle={{color: 'red'}}><Id>Id: {user.id}</Id></Link>
+        </Container>
+    );
 };
 
-export default Player;
+export default UserEntry;
