@@ -5,6 +5,8 @@ import { getDomain } from "../../helpers/getDomain";
 import User from "../shared/models/User";
 import { withRouter } from "react-router-dom";
 import { Button } from "../../views/design/Button";
+import Player from "../../views/Player";
+
 //not ready
 const FormContainer = styled.div`
   margin-top: 2em;
@@ -56,19 +58,19 @@ const ButtonContainer = styled.div`
   margin-top: 20px;
 `;
 
-const UserContainer = styled.div`
+const ProfileContainer = styled.div`
   display: block;
   justify-content: left;
 `;
 
-const UserString = styled.div`
+const ProfileString = styled.div`
    display:block;
    color: white;
    margin-bottom: 10px;
    font-weight:700;  
 `;
 
-const UserLabel = styled.div`
+const ProfileLabel = styled.div`
    text-transform: uppercase;
    margin-right: 15px;
 `;
@@ -82,7 +84,7 @@ const UserLabel = styled.div`
  * https://reactjs.org/docs/react-component.html
  * @Class
  */
-class SomeUser extends React.Component {
+class Profile extends React.Component {
     /**
      * If you don’t initialize the state and you don’t bind methods, you don’t need to implement a constructor for your React component.
      * The constructor for a React component is called before it is mounted (rendered).
@@ -92,44 +94,15 @@ class SomeUser extends React.Component {
     constructor() {
         super();
         this.state = {
-            username: null,
-            password: null
+            user: new User( {"username" : null, "birthday": null, "status": null, "timestamp": null} )
         };
     }
     /**
      * HTTP POST request is sent to the backend.
      * If the request is successful, a new user is returned to the front-end and its token is stored in the localStorage.
      */
-    register() {
-        fetch(`${getDomain()}/users`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                username: this.state.username,
-                name: this.state.name,
-                password: this.state.password
-            })
-        })
-            .then(response => response.json())
-            .then(returnedUser => {
-                const user = new User(returnedUser);
-                // store the token into the local storage
-                //localStorage.setItem("token", user.token);
-                // user login successfully worked --> navigate to the route /game in the GameRouter
-                this.props.history.push("/login");
-            })
-            .catch(err => {
-                if (err.message.match(/Failed to fetch/)) {
-                    alert("The server cannot be reached. Did you start it?");
-                } else {
-                    alert(`Something went wrong during the login: ${err.message}`);
-                }
-            });
-    }
 
-    game(){
+    getBack(){
         this.props.history.push("/game");
     }
 
@@ -151,33 +124,53 @@ class SomeUser extends React.Component {
      * You may call setState() immediately in componentDidMount().
      * It will trigger an extra rendering, but it will happen before the browser updates the screen.
      */
-    componentDidMount() {}
+    componentDidMount() {
+        var username = localStorage.getItem("chosenUser");
+        fetch(`${getDomain()}/users/` + username, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => response.json())
+            .then(returnedUser => {
+                // delays continuous execution of an async operation for 0.8 seconds.
+                // This is just a fake async call, so that the spinner can be displayed
+                // feel free to remove it :)
+                this.setState({ "user" : new User(returnedUser)});
+            })
+            .catch(err => {
+                console.log(err);
+                alert("Something went wrong fetching the users: " + err);
+            });
+
+    }
 
     render() {
         return (
             <BaseContainer>
                 <FormContainer>
                     <Form>
-                        <UserContainer>
-                            <UserString>
-                                <UserLabel>Username: </UserLabel>
-                            </UserString>
-                            <UserString>
-                                <UserLabel>Online status: </UserLabel>
-                            </UserString>
-                            <UserString>
-                                <UserLabel>Creation date: </UserLabel>
-                            </UserString>
-                            <UserString>
-                                <UserLabel>Birthday date: </UserLabel>
-                            </UserString>
-                        </UserContainer>
+                        <ProfileContainer>
+                            <ProfileString>
+                                <ProfileLabel>Username: </ProfileLabel>{this.state.user.username}
+                            </ProfileString>
+                            <ProfileString>
+                                <ProfileLabel>Online status: </ProfileLabel>{this.state.user.status}
+                            </ProfileString>
+                            <ProfileString>
+                                <ProfileLabel>Creation date: </ProfileLabel>{this.state.user.timestamp}
+                            </ProfileString>
+                            <ProfileString>
+                                <ProfileLabel>Birthday date: </ProfileLabel>{this.state.user.birthday}
+                            </ProfileString>
+                        </ProfileContainer>
                         <ButtonContainer>
                             <Button
                                 //disables button if username or name are empty
                                 width="50%"
                                 onClick={() => {
-                                    this.game();
+                                    this.getBack();
                                 }}
                             >
                                 Back
@@ -194,4 +187,4 @@ class SomeUser extends React.Component {
  * You can get access to the history object's properties via the withRouter.
  * withRouter will pass updated match, location, and history props to the wrapped component whenever it renders.
  */
-export default withRouter(SomeUser);
+export default withRouter(Profile);

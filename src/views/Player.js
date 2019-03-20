@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from 'react-router-dom';
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -35,7 +34,8 @@ const Player = ({ user }) => {
   return (
     <Container>
         <UserName>{user.username}</UserName>
-        <Link to="/user" style={{color: 'white'}} activeStyle={{color: 'red'}}><Id>Id: {user.id}</Id></Link>
+        <a href="/profile" onClick={()=>{this.props.history.push("/profile");
+            localStorage.setItem("chosenUser", user.username);}}>Id: {user.id}</a>
     </Container>
   );
 };
